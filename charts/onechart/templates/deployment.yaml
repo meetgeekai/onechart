@@ -17,7 +17,7 @@ spec:
   selector:
     matchLabels:
       {{- include "helm-chart.selectorLabels" . | nindent 6 }}
-      {{- if .Values.selector.matchLabels }}
+      {{- if .Values.selector }}
         {{- with .Values.selector.matchLabels }}
         {{- toYaml . | nindent 6 }}
         {{- end }}
