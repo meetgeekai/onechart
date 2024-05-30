@@ -17,8 +17,10 @@ spec:
   selector:
     matchLabels:
       {{- include "helm-chart.selectorLabels" . | nindent 6 }}
-      {{- with .Values.selector.matchLabels }}
-      {{- toYaml . | nindent 6 }}
+      {{- if .Values.selector.matchLabels }}
+        {{- with .Values.selector.matchLabels }}
+        {{- toYaml . | nindent 6 }}
+        {{- end }}
       {{- end }}
   {{- $singleReplica := eq (.Values.replicas | int64) 1 }}
   {{- $strategyNotDefined := not .Values.strategy }}
