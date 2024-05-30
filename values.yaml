@@ -1,0 +1,28 @@
+ingress:
+  host: chart-example.local
+  ingressClassName: nginx
+
+gitRepository: laszlocph/demo-app
+gitSha: xyz
+
+
+volumes:
+  - name: testing
+    path: /deleteme
+    hostPath:
+      path: /deleteme
+  - name: empty
+    path: /deleteme2
+    emptyDir: true
+
+vars:
+  var1: value1
+  var2: value2
+
+probe:
+  enabled: true
+  settings:
+    periodSeconds: 30
+
+podSpec:
+  hostNetwork: true
