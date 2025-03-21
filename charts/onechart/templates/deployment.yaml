@@ -30,7 +30,10 @@ spec:
   {{- end }}
   {{- if .Values.strategy }}
   strategy:
-    type: {{ .Values.strategy }}
+    type: RollingUpdate # Default chart value has been: {{ .Values.strategy }}
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   {{- end }}
   template:
     metadata:
