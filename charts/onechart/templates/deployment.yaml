@@ -22,19 +22,11 @@ spec:
         {{- toYaml . | nindent 6 }}
         {{- end }}
       {{- end }}
-  {{- $singleReplica := eq (.Values.replicas | int64) 1 }}
-  {{- $strategyNotDefined := not .Values.strategy }}
-  {{- if and (and .Values.volumes $singleReplica) $strategyNotDefined}}
   strategy:
-    type: Recreate
-  {{- end }}
-  {{- if .Values.strategy }}
-  strategy:
-    type: RollingUpdate # Default chart value has been: {{ .Values.strategy }}
+    type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 0
       maxSurge: 1
-  {{- end }}
   template:
     metadata:
       annotations:
