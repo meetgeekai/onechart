@@ -4,7 +4,9 @@ volumes:
   {{- range .Values.volumes }}
   - name: {{ .name }}
     {{- if .emptyDir }}
-    emptyDir: {}
+    emptyDir:
+      sizeLimit: {{ default "64Mi" .emptyDirConfig.size }}
+      medium: {{ default "Memory" .emptyDirConfig.medium }}
     {{- else if .existingConfigMap }}
     configMap:
       name: {{ .existingConfigMap }}
