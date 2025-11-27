@@ -8,6 +8,9 @@ volumeMounts:
     {{- if .subPath }}
     subPath: {{ .subPath }}
     {{- end }}
+    {{- if .readOnly }}
+    readOnly: {{ .readOnly }}
+    {{- end }}
 {{- end }}    
 {{- end }}    
 {{- range .Values.sealedFileSecrets }}
