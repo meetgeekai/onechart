@@ -1,0 +1,38 @@
+{{- if .Values.migrationJob }}
+{{- if .Values.migrationJob.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  # The name must change every time the tag changes to avoid "Job already exists" errors
+  name: {{ template "robustName" .Release.Name }}-mig-{{ .Values.image.tag | lower | replace "." "-" | replace ":" "-" }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+spec:
+  activeDeadlineSeconds: 600 # 10-minute timeout guardrail
+  template:
+    spec:
+      containers:
+        - name: migrate
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command: ["/bin/sh", "-c"]
+          args: 
+            - {{ .Values.migrationJob.command | default "php artisan migrate --force" | quote }}
+          envFrom:
+            - secretRef:
+                name: {{ template "robustName" .Release.Name }}
+          env:
+            {{- range $key, $value := .Values.vars }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- range $key, $value := .Values.overrideVars }}
+            - name: {{ $key }}
+              valueFrom:
+                fieldRef:
+                  fieldPath: {{ $value }}
+            {{- end }}
+      restartPolicy: OnFailure
+{{- end }}
+{{- end }}
