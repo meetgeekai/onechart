@@ -19,12 +19,24 @@ spec:
         - name: {{ . }}
         {{- end }}
       {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: migrate
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           command: ["/bin/sh", "-c"]
           args: 
             - {{ .Values.migrationJob.command | default "php artisan migrate --force" | quote }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           envFrom:
             - secretRef:
                 name: {{ template "robustName" .Release.Name }}
