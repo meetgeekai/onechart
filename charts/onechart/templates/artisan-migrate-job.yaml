@@ -3,7 +3,6 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  # The name must change every time the tag changes to avoid "Job already exists" errors
   name: {{ template "robustName" .Release.Name }}-mig-{{ .Values.image.tag | lower | replace "." "-" | replace ":" "-" }}
   namespace: {{ .Release.Namespace }}
   annotations:
@@ -31,7 +30,7 @@ spec:
         - name: migrate
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           command: ["/bin/sh", "-c"]
-          args: 
+          args:
             - {{ .Values.migrationJob.command | default "php artisan migrate --force" | quote }}
           {{- with .Values.resources }}
           resources:
@@ -51,6 +50,17 @@ spec:
                 fieldRef:
                   fieldPath: {{ $value }}
             {{- end }}
+
+          {{- with .Values.migrationJob.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
       restartPolicy: OnFailure
+
+      {{- with .Values.migrationJob.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
 {{- end }}
 {{- end }}
