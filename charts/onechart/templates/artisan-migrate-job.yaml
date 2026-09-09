@@ -9,7 +9,7 @@ metadata:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
 spec:
-  activeDeadlineSeconds: 600 # 10-minute timeout guardrail
+  activeDeadlineSeconds: {{ .Values.migrationJob.activeDeadlineSeconds | default 600 }}
   template:
     spec:
       {{- with .Values.imagePullSecrets }}

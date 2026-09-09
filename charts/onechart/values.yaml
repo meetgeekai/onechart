@@ -80,3 +80,6 @@ monitor:
 
 container: {}
 podSpec: {}
+
+# migrationJob:
+#   activeDeadlineSeconds: 600
