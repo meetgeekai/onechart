@@ -82,4 +82,14 @@ container: {}
 podSpec: {}
 
 # migrationJob:
+#   enabled: true
+#   command: "php artisan migrate --force"   # run with /bin/sh -c
 #   activeDeadlineSeconds: 600
+#   # PreSync (default): runs before the whole sync, with the PREVIOUS sync's Secret.
+#   # Sync: runs after the SealedSecret is applied and before the Deployment. Use it when the
+#   # migration needs secrets that can be new in this sync, including the very first deploy.
+#   hook: PreSync
+#   # Optional; unset keeps the Kubernetes default (6).
+#   backoffLimit: 2
+#   volumes: []
+#   volumeMounts: []
