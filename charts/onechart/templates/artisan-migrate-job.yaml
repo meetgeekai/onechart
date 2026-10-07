@@ -1,15 +1,45 @@
 {{- if .Values.migrationJob }}
 {{- if .Values.migrationJob.enabled }}
+{{- /*
+  Kubernetes rejects a Job name over 63 characters: it is copied into the pod's job-name label.
+  A long release name plus the image tag gets there easily, so an over-long name is cut and
+  suffixed with a hash of the full name. Names that already fit are left exactly as they were.
+*/}}
+{{- $tag := .Values.image.tag | toString | lower | replace "." "-" | replace ":" "-" }}
+{{- $tag = regexReplaceAll "[^a-z0-9-]+" $tag "-" }}
+{{- $name := printf "%s-mig-%s" (include "robustName" .Release.Name) $tag }}
+{{- if gt (len $name) 63 }}
+{{- $name = printf "%s-%s" ($name | trunc 56 | trimSuffix "-") ($name | sha256sum | trunc 6) }}
+{{- end }}
+{{- /*
+  hook: PreSync (default) runs before every resource of the sync, the release's SealedSecret
+  included. So the Job reads the Secret of the PREVIOUS sync: on a first deploy it does not exist
+  yet and the Job hangs until activeDeadlineSeconds, and a secret added in the same commit as the
+  code that needs it is missing.
+  hook: Sync runs the Job in the Sync phase at wave -1, after the SealedSecret (wave -2, see
+  common/_sealedSecret.yaml) and before the Deployment and everything else at wave 0. A failed
+  migration still stops the sync before any pod rolls.
+*/}}
+{{- $hook := .Values.migrationJob.hook | default "PreSync" }}
+{{- if not (has $hook (list "PreSync" "Sync")) }}
+{{- fail (printf "migrationJob.hook must be PreSync or Sync, got %q" $hook) }}
+{{- end }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ template "robustName" .Release.Name }}-mig-{{ .Values.image.tag | lower | replace "." "-" | replace ":" "-" }}
+  name: {{ $name }}
   namespace: {{ .Release.Namespace }}
   annotations:
-    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook: {{ $hook }}
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+    {{- if eq $hook "Sync" }}
+    argocd.argoproj.io/sync-wave: "-1"
+    {{- end }}
 spec:
   activeDeadlineSeconds: {{ .Values.migrationJob.activeDeadlineSeconds | default 600 }}
+  {{- if hasKey .Values.migrationJob "backoffLimit" }}
+  backoffLimit: {{ .Values.migrationJob.backoffLimit }}
+  {{- end }}
   template:
     spec:
       {{- with .Values.imagePullSecrets }}
