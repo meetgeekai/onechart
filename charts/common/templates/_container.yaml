@@ -26,7 +26,7 @@ ports:
 readinessProbe:
   httpGet:
     path: {{ .Values.probe.path }}
-    port: {{ .Values.containerPort }}
+    port: {{ .Values.probe.port | default .Values.containerPort }}
     scheme: HTTP
   {{- with .Values.probe.settings }}
   {{- toYaml . | nindent 2 }}
@@ -36,9 +36,19 @@ readinessProbe:
 livenessProbe:
   httpGet:
     path: {{ .Values.livenessProbe.path }}
-    port: {{ .Values.containerPort }}
+    port: {{ .Values.livenessProbe.port | default .Values.containerPort }}
     scheme: HTTP
   {{- with .Values.livenessProbe.settings }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+{{- end }}
+{{- if and .Values.startupProbe .Values.startupProbe.enabled }}
+startupProbe:
+  httpGet:
+    path: {{ .Values.startupProbe.path }}
+    port: {{ .Values.startupProbe.port | default .Values.containerPort }}
+    scheme: HTTP
+  {{- with .Values.startupProbe.settings }}
   {{- toYaml . | nindent 2 }}
   {{- end }}
 {{- end }}

@@ -11,7 +11,7 @@
         "repository": "nginx",
         "tag": "latest"
       },
-      "imagePullSecrets" : [],
+      "imagePullSecrets": [],
       "replicas": 1,
       "nameOverride": "",
       "fullnameOverride": "",
@@ -133,7 +133,7 @@
         ]
       }
     },
-    "imagePullSecrets" : {
+    "imagePullSecrets": {
       "$id": "#/properties/imagePullSecrets",
       "type": "array",
       "title": "ImagePull Secrets",
@@ -598,6 +598,17 @@
               "maximum": 15
             }
           }
+        },
+        "port": {
+          "$id": "#/properties/probe/properties/port",
+          "type": "integer",
+          "title": "Port",
+          "description": "Port the probe calls; defaults to containerPort",
+          "minimum": 1,
+          "maximum": 65535,
+          "examples": [
+            9000
+          ]
         }
       }
     },
@@ -698,6 +709,128 @@
               "maximum": 15
             }
           }
+        },
+        "port": {
+          "$id": "#/properties/livenessProbe/properties/port",
+          "type": "integer",
+          "title": "Port",
+          "description": "Port the probe calls; defaults to containerPort",
+          "minimum": 1,
+          "maximum": 65535,
+          "examples": [
+            9000
+          ]
+        }
+      }
+    },
+    "startupProbe": {
+      "$id": "#/properties/startupProbe",
+      "type": "object",
+      "title": "Startup check",
+      "description": "The Kubernetes Startup probe holds liveness and readiness checks off until the app has started",
+      "default": {},
+      "examples": [
+        {
+          "enabled": false,
+          "path": "/"
+        }
+      ],
+      "required": [
+        "enabled",
+        "path"
+      ],
+      "properties": {
+        "enabled": {
+          "$id": "#/properties/startupProbe/properties/enabled",
+          "type": "boolean",
+          "title": "",
+          "description": "",
+          "default": false,
+          "examples": [
+            false
+          ]
+        },
+        "path": {
+          "$id": "#/properties/startupProbe/properties/path",
+          "type": "string",
+          "title": "Path",
+          "description": "Fill in the description",
+          "default": "/",
+          "examples": [
+            "/"
+          ]
+        },
+        "settings": {
+          "$id": "#/properties/startupProbe/properties/settings",
+          "type": "object",
+          "title": "Probe thresholds",
+          "description": "Tune the probe behavior",
+          "examples": [
+            {
+              "failureThreshold": 3,
+              "periodSeconds": 10,
+              "successThreshold": 1,
+              "timeoutSeconds": 10
+            }
+          ],
+          "properties": {
+            "initialDelaySeconds": {
+              "$id": "#/properties/startupProbe/properties/settings/properties/initialDelaySeconds",
+              "type": "integer",
+              "title": "Initial Delay Seconds",
+              "description": "Number of seconds after the container has started before the probe is initiated",
+              "default": 0,
+              "minimum": 0,
+              "maximum": 180
+            },
+            "periodSeconds": {
+              "$id": "#/properties/startupProbe/properties/settings/properties/periodSeconds",
+              "type": "integer",
+              "title": "Period",
+              "description": "How often (in seconds) to perform the probe",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 60
+            },
+            "successThreshold": {
+              "$id": "#/properties/startupProbe/properties/settings/properties/successThreshold",
+              "type": "integer",
+              "title": "Success Threshold",
+              "description": "Minimum consecutive successes for the probe to be considered successful after having failed",
+              "default": 1,
+              "minimum": 1,
+              "maximum": 15
+            },
+            "timeoutSeconds": {
+              "$id": "#/properties/startupProbe/properties/settings/properties/timeoutSeconds",
+              "type": "integer",
+              "title": "Timeout",
+              "description": "Number of seconds after which the probe times out",
+              "default": 3,
+              "minimum": 1,
+              "maximum": 30
+            },
+            "failureThreshold": {
+              "$id": "#/properties/startupProbe/properties/settings/properties/failureThreshold",
+              "type": "integer",
+              "title": "Failure Threshold",
+              "description": "When a probe fails, Kubernetes will try this many times before giving up. Giving up the pod will be marked Unready and won't get any traffic",
+              "default": 3,
+              "minimum": 1,
+              "maximum": 15
+            }
+          }
+        },
+        "port": {
+          "$id": "#/properties/startupProbe/properties/port",
+          "type": "integer",
+          "title": "Port",
+          "description": "Port the probe calls; defaults to containerPort",
+          "minimum": 1,
+          "maximum": 65535,
+          "examples": [
+            9000
+          ]
         }
       }
     },
