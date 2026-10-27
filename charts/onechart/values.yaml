@@ -47,6 +47,7 @@ tolerations: []
 probe:
   enabled: false
   path: "/"
+  # port: 9000  # serve probes off the app port; defaults to containerPort
   settings:
     initialDelaySeconds: 0
     periodSeconds: 10
@@ -58,12 +59,24 @@ probe:
 livenessProbe:
   enabled: false
   path: "/"
+  # port: 9000  # defaults to containerPort
   settings:
     initialDelaySeconds: 0
     periodSeconds: 10
     successThreshold: 1
     timeoutSeconds: 3
     failureThreshold: 3
+
+# Holds liveness and readiness off until the app has started, so a slow start
+# is not killed by the liveness probe. Budget: periodSeconds x failureThreshold.
+startupProbe:
+  enabled: false
+  path: "/"
+  # port: 9000  # defaults to containerPort
+  settings:
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 15
 
 secretEnabled: false
 
