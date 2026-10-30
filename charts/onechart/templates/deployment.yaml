@@ -22,11 +22,17 @@ spec:
         {{- toYaml . | nindent 6 }}
         {{- end }}
       {{- end }}
+  {{- /* hasKey, not default: default treats an explicit 0 as unset and would turn maxSurge 0 into 1 */}}
+  {{- $rs := default dict .Values.rolloutStrategy }}
   strategy:
+  {{- if eq (get $rs "type" | default "RollingUpdate") "Recreate" }}
+    type: Recreate
+  {{- else }}
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: {{ default 0 (get (default dict .Values.rolloutStrategy) "maxUnavailable") }}
-      maxSurge: {{ default 1 (get (default dict .Values.rolloutStrategy) "maxSurge") }}
+      maxUnavailable: {{ hasKey $rs "maxUnavailable" | ternary (get $rs "maxUnavailable") 0 }}
+      maxSurge: {{ hasKey $rs "maxSurge" | ternary (get $rs "maxSurge") 1 }}
+  {{- end }}
   template:
     metadata:
       annotations:

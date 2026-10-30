@@ -18,6 +18,11 @@ image:
 
 # replicas: 69
 
+# rolloutStrategy:
+#   type: RollingUpdate  # or Recreate: stops all old pods before starting new ones (downtime)
+#   maxUnavailable: 0    # RollingUpdate only
+#   maxSurge: 1          # RollingUpdate only
+
 nameOverride: ""
 fullnameOverride: ""
 
