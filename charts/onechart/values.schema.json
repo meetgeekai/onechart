@@ -161,6 +161,24 @@
         1
       ]
     },
+    "rolloutStrategy": {
+      "$id": "#/properties/rolloutStrategy",
+      "type": "object",
+      "title": "Rollout strategy",
+      "description": "RollingUpdate (default) or Recreate. maxUnavailable and maxSurge apply to RollingUpdate only.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["RollingUpdate", "Recreate"]
+        },
+        "maxUnavailable": {
+          "type": ["integer", "string"]
+        },
+        "maxSurge": {
+          "type": ["integer", "string"]
+        }
+      }
+    },
     "podDisruptionBudgetEnabled": {
       "$id": "#/properties/podDisruptionBudgetEnabled",
       "type": "boolean",
