@@ -6,6 +6,9 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "helm-chart.labels" . | nindent 4 }}
+    {{- with .Values.prometheusLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
   {{- if or .Values.gitRepository .Values.gitSha }}
   annotations:
     {{- if .Values.gitRepository }}
@@ -17,7 +20,7 @@ metadata:
   {{- end }}
 spec:
   endpoints:
-  - interval: 60s
+  - interval: {{ default "60s" .Values.monitor.interval }}
     params:
       format:
       - prometheus

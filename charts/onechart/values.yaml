@@ -95,6 +95,27 @@ nodePortEnabled: false
 # Set true to enable service monitor.
 monitor:
   enabled: false
+  # path: /metrics
+  # portName: http
+  # interval: 60s
+
+# Labels added to the ServiceMonitor and the PrometheusRule, so the cluster's Prometheus selects them.
+# kube-prometheus-stack only picks up objects labelled with its release, e.g.:
+# prometheusLabels:
+#   release: kube-prom-stack
+prometheusLabels: {}
+
+# Alerting rules, rendered as one PrometheusRule. Example:
+# prometheusRules:
+#   - name: MyAppDown
+#     expression: up{namespace="my-app"} == 0
+#     for: 5m
+#     labels:
+#       severity: critical
+#     annotations:
+#       summary: My app is down
+#       description: Prometheus cannot scrape my-app.
+prometheusRules: []
 
 container: {}
 podSpec: {}
