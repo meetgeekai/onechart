@@ -6,19 +6,32 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "helm-chart.labels" . | nindent 4 }}
-annotations:
+    {{- with .Values.prometheusLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   groups:
-    - name: kubernetes-apps
+    - name: {{ template "robustName" .Release.Name }}
       rules:
         {{- range $rule := .Values.prometheusRules }}
         - alert: {{ $rule.name }}
-          annotations:
-            message: {{ $rule.message | quote }}
-            runbook_url: {{ $rule.runBookURL | quote }}
           expr: {{ $rule.expression | quote }}
-          for: {{ $rule.for | quote }}
+          {{- with $rule.for }}
+          for: {{ . | quote }}
+          {{- end }}
+          {{- with $rule.labels }}
           labels:
-            {{- toYaml $rule.labels | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          annotations:
+            {{- with $rule.message }}
+            message: {{ . | quote }}
+            {{- end }}
+            {{- with $rule.runBookURL }}
+            runbook_url: {{ . | quote }}
+            {{- end }}
+            {{- range $key, $value := $rule.annotations }}
+            {{ $key }}: {{ $value | quote }}
+            {{- end }}
         {{- end }}
 {{- end }}
